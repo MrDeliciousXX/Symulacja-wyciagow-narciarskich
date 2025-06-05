@@ -9,26 +9,45 @@ def SymulacjaWyciaguNarciarskiego(
     liczbaWyciagow,
     liczbaNarciarzy,
     czasSzczytu,
-    szerokoscSzczytu
+    szerokoscSzczytu,
+    prawdopodobienstwo_awarii=0.002,
+    prawdopodobienstwo_postoju=0.05
 ):
     print(f"Symulacja: {czasOtwarcia}s, krzesełko co {interwalKrzeselek}s, pojemność {pojemnoscKrzeselka}, wyciągów: {liczbaWyciagow}")
+
     czasy = generuj_czasy_przyjsc_narciarzy(czasOtwarcia, liczbaNarciarzy, czasSzczytu, szerokoscSzczytu)
 
     zdarzenia = []
     for t in czasy:
         zdarzenia.append(("A", t))  # przyjście narciarza
 
+    liczba_awarii = 0
+    liczba_postojow = 0
+
     for wyciag in range(liczbaWyciagow):
         t = 0
         while t < czasOtwarcia:
+            delay = 0
+
+            # Postój
+            if random.random() < prawdopodobienstwo_postoju:
+                postoj = random.randint(10, 30)
+                delay += postoj
+                liczba_postojow += 1
+
+            # Awaria
+            if random.random() < prawdopodobienstwo_awarii:
+                awaria = random.randint(300, 900)  # 5–15 minut
+                delay += awaria
+                liczba_awarii += 1
+
             zdarzenia.append(("B", t))  # odjazd krzesełka
-            t += interwalKrzeselek
+            t += interwalKrzeselek + delay
 
     zdarzenia.sort(key=lambda x: x[1])
 
     kolejka = []
     czasy_oczekiwania = []
-
     czasy_kolejki = []
     dlugosci_kolejki = []
 
@@ -49,10 +68,13 @@ def SymulacjaWyciaguNarciarskiego(
     srednie_czekanie = sum(czasy_oczekiwania) / obsluzeni if obsluzeni else 0
     nieobsluzeni = len(kolejka)
 
+    # 🔚 Wypisanie wyników
     print(f"\n📊 WYNIKI SYMULACJI:")
     print(f"🧍‍♂️ Obsłużono narciarzy: {obsluzeni}")
     print(f"⌛ Średni czas oczekiwania: {srednie_czekanie:.2f} sek")
     print(f"❌ Nieobsłużeni narciarze: {nieobsluzeni}")
+    print(f"⚠️ Liczba awarii: {liczba_awarii}")
+    print(f"⏸ Liczba postojów: {liczba_postojow}")
 
     return {
         'czasy_oczekiwania': czasy_oczekiwania,
@@ -61,7 +83,10 @@ def SymulacjaWyciaguNarciarskiego(
         'sredni_czas_oczekiwania': srednie_czekanie,
         'obsluzeni': obsluzeni,
         'nieobsluzeni': nieobsluzeni,
+        'awarie': liczba_awarii,
+        'postoje': liczba_postojow,
     }
+
 
 def generuj_czasy_przyjsc_narciarzy(
     czasOtwarciaSekundy: int,

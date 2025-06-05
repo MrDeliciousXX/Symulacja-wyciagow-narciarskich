@@ -1,14 +1,18 @@
 import Symulacja
 import Analizy
 
-czasOtwarcia = 28800
-interwalKrzeselek = 15
-pojemnoscKrzeselka = 2
-liczbaWyciagow = 1
-liczbaNarciarzy = 3000
-czasSzczytu = 14400
-szerokoscSzczytu = 7200
 '''
+czasOtwarcia=3600,
+interwalKrzeselek=10,
+pojemnoscKrzeselka=4,
+liczbaWyciagow=2,
+liczbaNarciarzy=400,
+czasSzczytu=1800,
+szerokoscSzczytu=600,
+prawdopodobienstwo_awarii=0.002,     # ~1 awaria na 500 wyjazdów
+prawdopodobienstwo_postoju=0.05      # 5% szansy na postój
+
+
 wynik = Symulacja.SymulacjaWyciaguNarciarskiego(
     czasOtwarcia,    # 8 godzin
     interwalKrzeselek,       # co 15 sekund
