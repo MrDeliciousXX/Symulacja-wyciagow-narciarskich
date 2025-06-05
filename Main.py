@@ -2,7 +2,7 @@ import Symulacja
 import Analizy
 
 '''
-czasOtwarcia=3600,
+czasOtwarcia=28800,
 interwalKrzeselek=10,
 pojemnoscKrzeselka=4,
 liczbaWyciagow=2,
