@@ -19,12 +19,12 @@ def analiza_liczby_wyciagow(liczbaNarciarzy, zakres):
 
     # Wykres
     x = [w[0] for w in wyniki]
-    y = [w[1] for w in wyniki]
+    y = [w[1] / 60 for w in wyniki]
 
     plt.figure()
     plt.plot(x, y, marker='o')
     plt.xlabel("Liczba wyciągów")
-    plt.ylabel("Średni czas oczekiwania [s]")
+    plt.ylabel("Średni czas oczekiwania [min]")
     plt.title("Wpływ liczby wyciągów na czas oczekiwania")
     plt.grid(True)
     plt.show()
@@ -45,12 +45,12 @@ def analiza_pojemnosci_krzeselek(liczbaNarciarzy, zakres):
         wyniki.append((pojemnosc, wynik['sredni_czas_oczekiwania']))
 
     x = [w[0] for w in wyniki]
-    y = [w[1] for w in wyniki]
+    y = [w[1] / 60 for w in wyniki]
 
     plt.figure()
     plt.plot(x, y, marker='o', color='green')
     plt.xlabel("Pojemność krzesełka")
-    plt.ylabel("Średni czas oczekiwania [s]")
+    plt.ylabel("Średni czas oczekiwania [min]")
     plt.title(f"Wpływ pojemności krzesełka (narciarzy: {liczbaNarciarzy})")
     plt.grid(True)
     plt.show()
@@ -70,7 +70,7 @@ def analiza_pojemnosci_i_wyciagow(liczbaNarciarzy, zakres_pojemnosci, zakres_wyc
                 czasSzczytu=14400,
                 szerokoscSzczytu=7200
             )
-            wiersz.append(wynik['sredni_czas_oczekiwania'])
+            wiersz.append(wynik['sredni_czas_oczekiwania'] / 60)
         heatmap.append(wiersz)
 
     heatmap = np.array(heatmap)
@@ -78,7 +78,7 @@ def analiza_pojemnosci_i_wyciagow(liczbaNarciarzy, zakres_pojemnosci, zakres_wyc
     plt.figure(figsize=(8, 6))
     im = plt.imshow(heatmap, cmap='YlOrRd', origin='lower')
 
-    plt.colorbar(im, label='Średni czas oczekiwania [s]')
+    plt.colorbar(im, label='Średni czas oczekiwania [min]')
     plt.xticks(ticks=range(len(zakres_wyciagow)), labels=zakres_wyciagow)
     plt.yticks(ticks=range(len(zakres_pojemnosci)), labels=zakres_pojemnosci)
     plt.xlabel("Liczba wyciągów")
@@ -94,24 +94,24 @@ def analiza_zbiorcza(liczbaNarciarzy, zakres_pojemnosci, zakres_wyciagow):
     wyniki_wyciagi = []
     for wyc in zakres_wyciagow:
         wynik = Symulacja.SymulacjaWyciaguNarciarskiego(28800, 15, 2, wyc, liczbaNarciarzy, 14400, 7200)
-        wyniki_wyciagi.append(wynik['sredni_czas_oczekiwania'])
+        wyniki_wyciagi.append(wynik['sredni_czas_oczekiwania'] / 60)
 
     axs[0].plot(zakres_wyciagow, wyniki_wyciagi, marker='o')
     axs[0].set_title("Liczba wyciągów")
     axs[0].set_xlabel("Wyciągi")
-    axs[0].set_ylabel("Średni czas oczekiwania [s]")
+    axs[0].set_ylabel("Średni czas oczekiwania [min]")
     axs[0].grid(True)
 
     # 2. Wpływ pojemności krzesełka
     wyniki_poj = []
     for poj in zakres_pojemnosci:
         wynik = Symulacja.SymulacjaWyciaguNarciarskiego(28800, 15, poj, 2, liczbaNarciarzy, 14400, 7200)
-        wyniki_poj.append(wynik['sredni_czas_oczekiwania'])
+        wyniki_poj.append(wynik['sredni_czas_oczekiwania'] / 60)
 
     axs[1].plot(zakres_pojemnosci, wyniki_poj, marker='s', color='green')
     axs[1].set_title("Pojemność krzesełka")
     axs[1].set_xlabel("Pojemność")
-    axs[1].set_ylabel("Średni czas oczekiwania [s]")
+    axs[1].set_ylabel("Średni czas oczekiwania [min]")
     axs[1].grid(True)
 
     # 3. Heatmapa: pojemność vs wyciągi
@@ -121,7 +121,7 @@ def analiza_zbiorcza(liczbaNarciarzy, zakres_pojemnosci, zakres_wyciagow):
         wiersz = []
         for wyc in zakres_wyciagow:
             wynik = Symulacja.SymulacjaWyciaguNarciarskiego(28800, 15, poj, wyc, liczbaNarciarzy, 14400, 7200)
-            wiersz.append(wynik['sredni_czas_oczekiwania'])
+            wiersz.append(wynik['sredni_czas_oczekiwania'] / 60)
         heatmap.append(wiersz)
 
     heatmap = np.array(heatmap)
@@ -132,8 +132,33 @@ def analiza_zbiorcza(liczbaNarciarzy, zakres_pojemnosci, zakres_wyciagow):
     axs[2].set_yticklabels(zakres_pojemnosci)
     axs[2].set_xlabel("Wyciągi")
     axs[2].set_ylabel("Pojemność")
-    axs[2].set_title("Czas oczekiwania [s]")
-    fig.colorbar(im, ax=axs[2])
+    axs[2].set_title("Czas oczekiwania [min]")
+    fig.colorbar(im, ax=axs[2], fraction=0.046, pad=0.04)
 
+    plt.tight_layout()
+    plt.show()
+
+def analiza_wplywu_narciarzy(liczbaWyciagow, pojemnoscKrzeselka, zakres_narciarzy):
+    wyniki = []
+
+    for liczba in zakres_narciarzy:
+        wynik = Symulacja.SymulacjaWyciaguNarciarskiego(
+            czasOtwarcia=28800,
+            interwalKrzeselek=15,
+            pojemnoscKrzeselka=pojemnoscKrzeselka,
+            liczbaWyciagow=liczbaWyciagow,
+            liczbaNarciarzy=liczba,
+            czasSzczytu=14400,
+            szerokoscSzczytu=7200
+        )
+        wyniki.append(wynik['sredni_czas_oczekiwania'] / 60)  # minuty
+
+    # Wykres
+    plt.figure(figsize=(8, 5))
+    plt.plot(zakres_narciarzy, wyniki, marker='^', color='purple')
+    plt.title(f"Średni czas oczekiwania vs liczba narciarzy\n(wyciągów: {liczbaWyciagow}, pojemność: {pojemnoscKrzeselka})")
+    plt.xlabel("Liczba narciarzy")
+    plt.ylabel("Średni czas oczekiwania [min]")
+    plt.grid(True)
     plt.tight_layout()
     plt.show()
