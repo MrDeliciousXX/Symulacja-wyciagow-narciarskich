@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 import Symulacja
 
 def analiza_liczby_wyciagow(liczbaNarciarzy, zakres):
@@ -162,3 +163,60 @@ def analiza_wplywu_narciarzy(liczbaWyciagow, pojemnoscKrzeselka, zakres_narciarz
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+
+def analiza_narciarzy_dla_wyciagow_i_pojemnosci(
+    max_wyciagow,
+    max_pojemnosc,
+    zakres_narciarzy,
+    katalog='wyniki_symulacji',
+    pokaz_wykresy=False
+):
+    os.makedirs(katalog, exist_ok=True)
+
+    max_oczekiwanie = Symulacja.SymulacjaWyciaguNarciarskiego(
+        czasOtwarcia=28800,
+        interwalKrzeselek=15,
+        pojemnoscKrzeselka=1,
+        liczbaWyciagow=1,
+        liczbaNarciarzy=max(zakres_narciarzy),
+        czasSzczytu=14400,
+        szerokoscSzczytu=7200
+    )['sredni_czas_oczekiwania'] / 60
+    max_y = max_oczekiwanie * 1.1
+
+    for liczba_wyciagow in range(1, max_wyciagow + 1):
+        for pojemnosc in range(1, max_pojemnosc + 1):
+            wyniki = []
+
+            for liczba_narciarzy in zakres_narciarzy:
+                wynik = Symulacja.SymulacjaWyciaguNarciarskiego(
+                    czasOtwarcia=28800,
+                    interwalKrzeselek=15,
+                    pojemnoscKrzeselka=pojemnosc,
+                    liczbaWyciagow=liczba_wyciagow,
+                    liczbaNarciarzy=liczba_narciarzy,
+                    czasSzczytu=14400,
+                    szerokoscSzczytu=7200
+                )
+                wyniki.append(wynik['sredni_czas_oczekiwania'] / 60)  # w minutach
+
+            # Wykres
+            plt.figure(figsize=(8, 5))
+            plt.plot(zakres_narciarzy, wyniki, marker='o', color='navy')
+            plt.ylim(0, max_y)
+            plt.title(f"Wyciągi: {liczba_wyciagow}, Pojemność: {pojemnosc}")
+            plt.xlabel("Liczba narciarzy")
+            plt.ylabel("Średni czas oczekiwania [min]")
+            plt.grid(True)
+            plt.tight_layout()
+
+            # Zapis
+            filename = f"{katalog}/czas_w{liczba_wyciagow}_p{pojemnosc}.png"
+            plt.savefig(filename)
+
+            if pokaz_wykresy:
+                plt.show()
+            else:
+                plt.close()
+
+    print(f"Zapisano wszystkie wykresy w katalogu '{katalog}'.")

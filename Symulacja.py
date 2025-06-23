@@ -70,6 +70,7 @@ def SymulacjaWyciaguNarciarskiego(
 
     # 🔚 Wypisanie wyników
     print(f"\n📊 WYNIKI SYMULACJI:")
+    print(f"Narciarze: {liczbaNarciarzy}, wyciągi: {liczbaWyciagow}, pojemność: {pojemnoscKrzeselka}")
     print(f"🧍‍♂️ Obsłużono narciarzy: {obsluzeni}")
     print(f"⌛ Średni czas oczekiwania: {srednie_czekanie:.2f} sek")
     print(f"❌ Nieobsłużeni narciarze: {nieobsluzeni}")

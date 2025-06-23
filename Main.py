@@ -31,7 +31,8 @@ Symulacja.rysuj_wykresy(
 '''
 #Analizy.analiza_liczby_wyciagow(liczbaNarciarzy=10000, zakres=[1, 2, 3, 4, 5])
 #Analizy.analiza_pojemnosci_krzeselek(liczbaNarciarzy=10000, zakres=[1, 2, 3, 4])
-#Analizy.analiza_pojemnosci_i_wyciagow(liczbaNarciarzy=10000, zakres_pojemnosci=[1, 2, 3, 4], zakres_wyciagow=[1, 2, 3, 4])
+Analizy.analiza_pojemnosci_i_wyciagow(liczbaNarciarzy=80000, zakres_pojemnosci=[1, 2, 4, 6, 8], zakres_wyciagow=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
 #Analizy.analiza_zbiorcza(liczbaNarciarzy=20000, zakres_wyciagow=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], zakres_pojemnosci=[1, 2, 3, 4, 5, 6])
-Analizy.analiza_wplywu_narciarzy(liczbaWyciagow=5, pojemnoscKrzeselka=2, zakres_narciarzy=range(5000, 25001, 1000))
+#Analizy.analiza_wplywu_narciarzy(liczbaWyciagow=5, pojemnoscKrzeselka=2, zakres_narciarzy=range(5000, 25001, 1000))
+
