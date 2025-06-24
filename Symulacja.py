@@ -23,6 +23,8 @@ def SymulacjaWyciaguNarciarskiego(
 
     liczba_awarii = 0
     liczba_postojow = 0
+    niepelne_krzeselka = 0
+    liczba_odjazdow = 0
 
     for wyciag in range(liczbaWyciagow):
         t = 0
@@ -51,16 +53,32 @@ def SymulacjaWyciaguNarciarskiego(
     czasy_kolejki = []
     dlugosci_kolejki = []
 
+    def losuj_liczbe_pasazerow(pojemnosc):
+        # im mniej osób na krzesełku, tym mniejsze prawdopodobieństwo dla tej kombinacji
+        base = 0.1  # minimalna waga
+        full_weight = 1.0
+        middle_weights = [base + (full_weight - base) * (i / pojemnosc) for i in range(pojemnosc)]
+        weights = middle_weights + [full_weight]
+        return random.choices(range(pojemnosc + 1), weights=weights)[0]
+
     for typ, t in zdarzenia:
         if typ == "A":
             kolejka.append(t)
             czasy_kolejki.append(t)
             dlugosci_kolejki.append(len(kolejka))
+
         elif typ == "B":
-            for _ in range(pojemnoscKrzeselka):
+            liczba_pasazerow = losuj_liczbe_pasazerow(pojemnoscKrzeselka)
+            liczba_odjazdow += 1
+
+            if liczba_pasazerow < pojemnoscKrzeselka:
+                niepelne_krzeselka += 1
+
+            for _ in range(liczba_pasazerow):
                 if kolejka:
                     czas_przyjscia = kolejka.pop(0)
                     czasy_oczekiwania.append(t - czas_przyjscia)
+
             czasy_kolejki.append(t)
             dlugosci_kolejki.append(len(kolejka))
 
@@ -70,12 +88,12 @@ def SymulacjaWyciaguNarciarskiego(
 
     # 🔚 Wypisanie wyników
     print(f"\n📊 WYNIKI SYMULACJI:")
-    print(f"Narciarze: {liczbaNarciarzy}, wyciągi: {liczbaWyciagow}, pojemność: {pojemnoscKrzeselka}")
     print(f"🧍‍♂️ Obsłużono narciarzy: {obsluzeni}")
     print(f"⌛ Średni czas oczekiwania: {srednie_czekanie:.2f} sek")
     print(f"❌ Nieobsłużeni narciarze: {nieobsluzeni}")
     print(f"⚠️ Liczba awarii: {liczba_awarii}")
     print(f"⏸ Liczba postojów: {liczba_postojow}")
+    print(f"🪑 Liczba niepełnych krzesełek: {niepelne_krzeselka}")
 
     return {
         'czasy_oczekiwania': czasy_oczekiwania,
@@ -86,6 +104,8 @@ def SymulacjaWyciaguNarciarskiego(
         'nieobsluzeni': nieobsluzeni,
         'awarie': liczba_awarii,
         'postoje': liczba_postojow,
+        'niepelne_krzeselka': niepelne_krzeselka,
+        'odjazdy': liczba_odjazdow
     }
 
 
