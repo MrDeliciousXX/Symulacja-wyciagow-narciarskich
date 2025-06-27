@@ -220,3 +220,37 @@ def analiza_narciarzy_dla_wyciagow_i_pojemnosci(
                 plt.close()
 
     print(f"Zapisano wszystkie wykresy w katalogu '{katalog}'.")
+
+def analiza_zapelnienia(liczbaNarciarzy, zakres_pojemnosci, liczbaWyciagow):
+    zapelnienia = []
+
+    for pojemnosc in zakres_pojemnosci:
+        wynik = Symulacja.SymulacjaWyciaguNarciarskiego(
+            czasOtwarcia=28800,
+            interwalKrzeselek=15,
+            pojemnoscKrzeselka=pojemnosc,
+            liczbaWyciagow=liczbaWyciagow,
+            liczbaNarciarzy=liczbaNarciarzy,
+            czasSzczytu=14400,
+            szerokoscSzczytu=7200
+        )
+
+        liczba_odjazdow = wynik['odjazdy']
+        suma_osob = wynik['obsluzeni']
+        srednie_zapelnienie = suma_osob / (liczba_odjazdow * pojemnosc) if liczba_odjazdow > 0 else 0
+        zapelnienia.append(srednie_zapelnienie)
+
+    indeksy = list(range(len(zakres_pojemnosci)))
+
+    plt.figure(figsize=(10, 5))
+    plt.bar(indeksy, zapelnienia, color='steelblue')
+    plt.axhline(1.0, color='green', linestyle='--', label='100% zapełnienia')
+    plt.ylim(0, 1.1)
+    plt.xticks(indeksy, zakres_pojemnosci)
+    plt.xlabel("Pojemność krzesełka")
+    plt.ylabel("Średni stopień zapełnienia")
+    plt.title("Średnie zapełnienie krzesełek")
+    plt.grid(True, axis='y')
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
